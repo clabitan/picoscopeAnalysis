@@ -14,7 +14,12 @@ $ make
 
 ## Running Scripts
 
-picoscopeAnalysis.cxx
+### picoscopeAnalysis.cxx
+
+This program calculates the time difference between the trigger (Ch. D) rising edge and the first 40MHz clock (Ch. C) rising edge after the trigger. The values are then saved in an output file. 
+
+
+This uses frame\_\*.csv files.
 
 ```bash
 

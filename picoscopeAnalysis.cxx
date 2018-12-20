@@ -7,11 +7,12 @@
 #include <string.h>
 
 #include <plotWithRoot.h>
+#include <picoscopeAnalysis.h>
 
-int main(int argc, char *argv[]) { //./plotWithRoot_Picoscope path/to/directory run#
+int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	if (argc < 3) {
-		std::cout << "No directory or run# given! \nExample: ./plotWithRoot_Picoscope path/to/directory/ run# \nExample: ./plotWithRoot_Picoscope /misc/archive/2018_11-05-slac_tb/yarr_data/scope/run_1541558824/ 511" << std::endl;
+		std::cout << "No directory or run# given! \nExample: ./picoscopeAnalysis path/to/directory/ run# \nExample: ./plotWithRoot_Picoscope /misc/archive/2018_11-05-slac_tb/yarr_data/scope/run_1541558824/ 511" << std::endl;
 		return -1;
 	}
 
