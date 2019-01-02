@@ -2,6 +2,18 @@
 
 #include <vector>
 
+//Find the maximum value
+
+double findMaxValue (std::vector <double> volt_values) {
+	double maxVolt = -10000;
+	for (unsigned i=0; i<volt_values.size(); i++) {
+		if (volt_values[i]>maxVolt) maxVolt = volt_values[i];
+	}
+	
+	return maxVolt;
+}
+
+
 
 //Find the nearest rising edge, and then find the index corresponding to the value closest to the threshold
 unsigned findRisingEdgeIndex (std::vector <double> volt_values, double threshold, unsigned startingIndex) {
