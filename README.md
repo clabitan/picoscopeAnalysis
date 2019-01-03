@@ -53,8 +53,8 @@ Example plot when saved from root file:
 
 Example plot when enabling canvas->SaveAs():
 <object data="Images/PicoscopeAnalysisPlot_SaveExample.pdf" type="application/pdf" width="700px">
-        <embed src="Images/PicoscopeAnalysisPlot_RootFileExample.pdf">
-                <p> This browser does not support PDFs. Please download the PDF to view it: <a href="Images/PicoscopeAnalysisPlot_RootFileExample.pdf"> Download PDF</a>.</p>
+        <embed src="Images/PicoscopeAnalysisPlot_SaveExample.pdf">
+                <p> This browser does not support PDFs. Please download the PDF to view it: <a href="Images/PicoscopeAnalysisPlot_SaveExample.pdf"> Download PDF</a>.</p>
         </embed>
 </object>
 

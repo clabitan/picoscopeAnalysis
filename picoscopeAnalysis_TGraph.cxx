@@ -218,7 +218,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				axisC->Draw();			
 */	
 				canvas->Write(); //Write to root file
-				canvas->SaveAs(graphName.c_str()); //Create pdf
+			//	canvas->SaveAs(graphName.c_str()); //Create pdf
 			
 				delete canvas;
 				for (int i=0; i<4; i++) {delete graphs[i];}
@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 			outofrangeCounter++;
 		}
 	}
-		std::cout << outofrangeCounter << "events have a time difference <190ms or >210ms. Total Events: " << eventNumValue.size() << std::endl;
+		std::cout << outofrangeCounter << " events have a time difference <190ms or >210ms. Total Events: " << eventNumValue.size() << std::endl;
 
 	return 0;
 } 
