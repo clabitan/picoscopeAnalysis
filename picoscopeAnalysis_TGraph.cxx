@@ -7,6 +7,8 @@
 #include <string.h>
 
 #include <TStyle.h>
+#include <TFile.h>
+#include <TTree.h>
 #include <RD53Style.C>
 #include <plotWithRoot.h>
 #include <picoscopeAnalysis.h>
@@ -41,10 +43,12 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	std::vector <double> deltaT_risingEdge;
 	std::vector <double> timeD_risingEdge, timeC_risingEdge;
 	std::vector <std::string> eventNum;
+	std::vector <unsigned long> eventNumValue; 
 
-//	filename << "plots_run" << run_num << ".root";  
-//	TFile graphFile(filename.c_str(), "RECREATE"); //Create root file, or rewrite file of the same name.
-
+	//Create root file
+	std::stringstream fileName;
+	fileName <<  "plots_run" << run_num << ".root";
+	TFile *graphFile = new TFile(fileName.str().c_str(), "RECREATE"); //Create root file, or rewrite file of the same name.
 
 	while ((dirp = readdir(dp))) { //pointer to structure representing directory entry at current position in directory stream, and positions directory stream at the next entry. Returns a null pointer at the end of the directory stream.
 
@@ -62,6 +66,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 			event_num = file_name.substr(file_name.find("_")+1, 13);
 			eventNum.push_back(event_num);
+			eventNumValue.push_back(std::strtoul(event_num.c_str(), NULL, 0));
 
 			std::string line;	
 
@@ -73,7 +78,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 			}
 
 			else {	
-				std::vector <double> time_values, ch_values[4], chC_multipliedShifted;	
+				std::vector <double> time_values, ch_values[4], chB_Shifted, chC_multipliedShifted;	
 
 				//For each channel and time, get values and store in vector.
 				while (getline(infile, line)) {
@@ -83,6 +88,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 					time_values.push_back(tmpTime*(1e6));
 					ch_values[0].push_back(tmpA);
 					ch_values[1].push_back(tmpB);
+					chB_Shifted.push_back(tmpB+1000);
 					ch_values[2].push_back(tmpC);
 					chC_multipliedShifted.push_back((tmpC*10)+1000);
 					ch_values[3].push_back(tmpD);
@@ -106,7 +112,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				timeC_risingEdge.push_back(timeRiseEdgeC);	
 				deltaT_risingEdge.push_back(timeRiseEdgeC-timeRiseEdgeD);
 
-				std::string graphName = event_num + "plot" + ".png";				
+				std::string graphName = event_num + "plot" + ".pdf";				
 
 				//Create RD53A Internal Label
 				TLatex *tname = new TLatex();
@@ -117,23 +123,22 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				std::string rd53 = "RD53A Internal";
 
 				//Create TCanvas for graphs
-				TCanvas *canvas = new TCanvas("canvas", "canvas", 0, 0, 1600, 1200);
+				TCanvas *canvas = new TCanvas(event_num.c_str(), event_num.c_str(), 0, 0, 1600, 1200);
 				style_TH1canvas(canvas);
 				canvas->SetRightMargin(0.09);
 
 				//Create TGraphs for each channel
 				std::string graphNames[4] = {"plotA", "plotB", "plotC", "plotD"};
-				std::string chNames[4] = {"A", "B", "C", "D"};
+				std::string chNames[4] = {"A", "B +1000mV_{offset}", "C [x10] +1000mV_{offset}", "D"};
 				int color[4] = {4, 2, 418, 800}; // {Blue, Red, Green, Yellow) to match the color scheme of the picoscope	
 				const int n = time_values.size();
 				TGraph *graphs[4];
-			//	TGraph *graph = new TGraph(n, &time_values[0], &ch_values[3][0]);
-			//	graph->Draw("LP A");	
 
 				for (int i=0; i<4; i++) {
-					if (i !=2) graphs[i] = new TGraph(n, &time_values[0], &ch_values[i][0]);
+					if (i !=1 and i!=2) graphs[i] = new TGraph(n, &time_values[0], &ch_values[i][0]);
+					else if (i == 1) {graphs[i] = new TGraph(n, &time_values[0], &chB_Shifted[0]);}
 					else if (i == 2) {graphs[i] = new TGraph(n, &time_values[0], &chC_multipliedShifted[0]); }
-					style_TGraph(graphs[i], "Time [#mus]", "Voltage [V]");
+					style_TGraph(graphs[i], "Time [#mus]", "Voltage [mV]");
 					graphs[i]->GetYaxis()->SetTitleSize(0.05);
 					graphs[i]->GetYaxis()->SetTitleOffset(1.43);
 					graphs[i]->GetYaxis()->SetLabelSize(0.05);
@@ -152,7 +157,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 				//Since TGraph's aren't defined with a name, need to use SetName first before adding to the legend
 				//Create TLegend
-				TLegend *lb = new TLegend(0.78, 0.70, 0.84, 0.91);
+				TLegend *lb = new TLegend(0.57, 0.67, 0.72, 0.91);
 				lb->SetHeader("Channels", "C");
 				for (int i=0; i<4; i++) { lb->AddEntry(chNames[i].c_str(), chNames[i].c_str(), "lp"); }
 				lb->SetBorderSize(0);
@@ -185,13 +190,11 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 				char deltaT[100] = {};	
 				sprintf(deltaT, "#DeltaT = %.2fns", (timeRiseEdgeC-timeRiseEdgeD)*1e3);
-				tname->DrawLatex(0.78, 0.68, deltaT);	
+				tname->DrawLatex(0.70, 0.65, deltaT);	
 				
 				graphs[3]->GetXaxis()->SetRangeUser(0.79, 0.83);
 				graphs[3]->GetYaxis()->SetRangeUser(0,3100);
 				canvas->Update();				
-
-				double maxCvalue = findMaxValue(chC_multipliedShifted);
 				
 				//Draw a new pad for the second y-axis
 				TPad *pad2 = new TPad("pad2", "", 0,0,1,1);
@@ -203,7 +206,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				pad2->SetFrameBorderMode(0);
 				pad2->Draw();
 				pad2->cd();
-
+/*
 				//Draw a y-axis for Ch C 
 				TGaxis *axisC = new TGaxis(0.91, 0.12, 0.91, 0.93, -100, 210, 506, "+L"); //pad x/y min=0 and max=1
 				axisC->SetName("axisC");
@@ -213,24 +216,17 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				axisC->SetTitleColor(418);
 				axisC->SetTitleOffset(1.1);
 				axisC->Draw();			
-	
-				canvas->SaveAs(graphName.c_str());
-			//	c->Print(graphName.c_str());
+*/	
+				canvas->Write(); //Write to root file
+				canvas->SaveAs(graphName.c_str()); //Create pdf
 			
 				delete canvas;
-//				delete graph;
-//				for (int i=0; i<4; i++) {delete graphs[i];}
+				for (int i=0; i<4; i++) {delete graphs[i];}
 			}
 		}
 	}
 
-	double sumVal=0;
-	for (unsigned i=0; i<meanChB.size(); i++) {
-		sumVal = sumVal + meanChB[i];
-	}	
-	int sizeVec = meanChB.size();	
-	double meanChB_val = sumVal/sizeVec;
-	
+	graphFile->Close();	
 
 	std::string filename1 = "run" + run_num + "_mean_chB.txt";
 	std::cout << "Creating file " << filename1 << std::endl;
@@ -241,7 +237,6 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	for (unsigned i=0; i<meanChB.size(); i++) {
 		newFile1 << run_num << "   " << eventNum[i] << "   " << meanChB[i] << "\n";
 	}
-	newFile1 << run_num << "   " << "AllEvents" << "   " << meanChB_val;
 
 	std::string filename2 = "run" + run_num + "_deltaT.txt";
 	std::cout << "Creating file " << filename2 << std::endl;
@@ -275,6 +270,22 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 		newFile4 << eventNum[i] << "	" << timeC_risingEdge[i] << "\n" ;	
 
 	}	
+
+	std::string filename5 = "run" + run_num + "_eventTimeDifference.txt";
+	std::cout << "Creating file " << filename5 << std::endl;
+	//Create output file for the time difference between each event (taken from the file name).
+	std::fstream newFile5(filename5.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name.
+	newFile5 << "Time Difference [ms] Between Each Event\n";
+	int outofrangeCounter=0;
+	for (unsigned i=1; i<eventNumValue.size(); i++) {
+		long eventTimeDiff = eventNumValue[i] - eventNumValue[i-1];
+		if (eventTimeDiff>190 and eventTimeDiff<210) newFile5 << eventTimeDiff << "\n";
+		else if (eventTimeDiff<190 || eventTimeDiff>210) { 
+			newFile5 << eventTimeDiff << "!!! \n";
+			outofrangeCounter++;
+		}
+	}
+		std::cout << outofrangeCounter << "events have a time difference <190ms or >210ms. Total Events: " << eventNumValue.size() << std::endl;
 
 	return 0;
 } 
