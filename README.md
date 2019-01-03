@@ -1,5 +1,5 @@
 # picoscopeAnalysis
-These scripts were intially written to analyze RD53A picoscope data for the November 2018 SLAC Test Beam Runs 506-513. They are similar to the scripts in Yarr/src/scripts and use the same header files. 
+These scripts were intially written to analyze RD53A picoscope data for the November 2018 SLAC Test Beam Runs 506-513. They are similar to the scripts in Yarr/src/scripts and use the same header files (included in this repository). 
 
 
 ## Compile with Makefile
@@ -34,12 +34,27 @@ This uses frame\_\*.csv files.
 
 ### picoscopeAnalysis_TGraph.cxx
 
-This program does the same as picoscopeAnalysis.cxx, with the addition of creating a root file containing plots for each event.
+This program does the same as picoscopeAnalysis.cxx, with the addition of creating a root file containing plots for each event and creating an output file containing the time difference between each event.
 
+This uses frame\_\*.csv files.
 
+```bash
+
+./picoscopeAnalysis_TGraph path/to/directory run#
+
+```
+
+Example plot when saved from root file:
 <object data="Images/PicoscopeAnalysisPlot_RootFileExample.pdf" type="application/pdf" width="700px">
 	<embed src="Images/PicoscopeAnalysisPlot_RootFileExample.pdf">
 		<p> This browser does not support PDFs. Please download the PDF to view it: <a href="Images/PicoscopeAnalysisPlot_RootFileExample.pdf"> Download PDF</a>.</p>
 	</embed>
+</object>
+
+Example plot when enabling canvas->SaveAs():
+<object data="Images/PicoscopeAnalysisPlot_SaveExample.pdf" type="application/pdf" width="700px">
+        <embed src="Images/PicoscopeAnalysisPlot_RootFileExample.pdf">
+                <p> This browser does not support PDFs. Please download the PDF to view it: <a href="Images/PicoscopeAnalysisPlot_RootFileExample.pdf"> Download PDF</a>.</p>
+        </embed>
 </object>
 
