@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				pad2->Draw();
 				pad2->cd();
 /*
-				//Draw a y-axis for Ch C 
+				//Draw a y-axis for Ch C, corresponding to Ch C voltages multiplied by 10 and shifted by +1000V. 
 				TGaxis *axisC = new TGaxis(0.91, 0.12, 0.91, 0.93, -100, 210, 506, "+L"); //pad x/y min=0 and max=1
 				axisC->SetName("axisC");
 				axisC->SetLabelColor(418);
@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	//Create output file for the mean Ch. B values
 	std::fstream newFile1(filename1.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name.
-	newFile1 << "Run # | Event # | Mean Voltage (V) for Ch. B \n";
+	newFile1 << "Run # | Event # | Mean Voltage [mV] for Ch. B \n";
 	for (unsigned i=0; i<meanChB.size(); i++) {
 		newFile1 << run_num << "   " << eventNum[i] << "   " << meanChB[i] << "\n";
 	}
@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time difference between the trigger (Ch D) rising edge and the 40MHz clock (Ch C) rising edge	
 	std::fstream newFile2(filename2.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile2 << "Run # | Event # | Delta T (s) Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
+	newFile2 << "Run # | Event # | Delta T [s] Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
 	for (unsigned i=0; i<deltaT_risingEdge.size(); i++) {
 		newFile2 << run_num << "   " << eventNum[i] << "   " <<  deltaT_risingEdge[i] << "\n" ;	
 	}	
@@ -254,7 +254,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time corresponding to the trigger rising edge at threshold
 	std::fstream newFile3(filename3.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile3 << "Rising Edge Time Point for Ch D (Trigger Channel) \n"; 
+	newFile3 << "Rising Edge Time Point [s] for Ch D (Trigger Channel) \n"; 
 	for (unsigned i=0; i<timeD_risingEdge.size(); i++) {
 		newFile3 << eventNum[i] << "	" << timeD_risingEdge[i] << "\n" ;	
 
@@ -265,7 +265,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time corresponding to Ch C rising edge at threshold
 	std::fstream newFile4(filename4.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile4 << "Rising Edge Time Point for Ch C \n"; 
+	newFile4 << "Rising Edge Time Point [s] for Ch C \n"; 
 	for (unsigned i=0; i<timeC_risingEdge.size(); i++) {
 		newFile4 << eventNum[i] << "	" << timeC_risingEdge[i] << "\n" ;	
 
@@ -275,17 +275,18 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	std::cout << "Creating file " << filename5 << std::endl;
 	//Create output file for the time difference between each event (taken from the file name).
 	std::fstream newFile5(filename5.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name.
-	newFile5 << "Time Difference [ms] Between Each Event\n";
+	newFile5 << "First Event Timestamp [ms]		Second Event Timestamp [ms]	Time Difference [ms] Between Each Event\n";
 	int outofrangeCounter=0;
 	for (unsigned i=1; i<eventNumValue.size(); i++) {
 		long eventTimeDiff = eventNumValue[i] - eventNumValue[i-1];
-		if (eventTimeDiff>190 and eventTimeDiff<210) newFile5 << eventTimeDiff << "\n";
-		else if (eventTimeDiff<190 || eventTimeDiff>210) { 
-			newFile5 << eventTimeDiff << "!!! \n";
+		newFile5 << eventNumValue[i-1] << "       " << eventNumValue[i] << "    " << eventTimeDiff;	
+		if (eventTimeDiff>100 and eventTimeDiff<300) newFile5 << "\n";
+		else if (eventTimeDiff<100 || eventTimeDiff>300) { 
+			newFile5 <<  "!!! \n";
 			outofrangeCounter++;
 		}
 	}
-		std::cout << outofrangeCounter << " events have a time difference <190ms or >210ms. Total Events: " << eventNumValue.size() << std::endl;
+		std::cout << outofrangeCounter << " events have a time difference <100ms or >300ms. Total Events: " << eventNumValue.size() << std::endl;
 
 	return 0;
 } 
