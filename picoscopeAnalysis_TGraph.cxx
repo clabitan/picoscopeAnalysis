@@ -5,6 +5,8 @@
 #include <sys/stat.h>
 #include <vector>
 #include <string.h>
+#include <stdio.h>
+#include <time.h>
 
 #include <TStyle.h>
 #include <TFile.h>
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	std::vector<double> meanChB;
 	std::vector <double> deltaT_risingEdge;
 	std::vector <double> timeD_risingEdge, timeC_risingEdge;
-	std::vector <std::string> eventNum;
+	std::vector <std::string> eventNum, eventDate;
 	std::vector <unsigned long> eventNumValue; 
 
 	//Create root file
@@ -196,6 +198,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				graphs[3]->GetYaxis()->SetRangeUser(0,3100);
 				canvas->Update();				
 				
+/*
 				//Draw a new pad for the second y-axis
 				TPad *pad2 = new TPad("pad2", "", 0,0,1,1);
 				pad2->SetFillStyle(0);
@@ -206,7 +209,6 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 				pad2->SetFrameBorderMode(0);
 				pad2->Draw();
 				pad2->cd();
-/*
 				//Draw a y-axis for Ch C, corresponding to Ch C voltages multiplied by 10 and shifted by +1000V. 
 				TGaxis *axisC = new TGaxis(0.91, 0.12, 0.91, 0.93, -100, 210, 506, "+L"); //pad x/y min=0 and max=1
 				axisC->SetName("axisC");
@@ -228,6 +230,16 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	graphFile->Close();	
 
+	
+	//Convert timestamp to Date Hour Minute Second
+
+	
+	for (unsigned i=0; i<eventNumValue.size(); i++) {
+		std::string realTime = convertTimestamp(eventNumValue[i]);		
+		eventDate.push_back(realTime);
+	}	
+
+
 	std::string filename1 = "run" + run_num + "_mean_chB.txt";
 	std::cout << "Creating file " << filename1 << std::endl;
 
@@ -243,7 +255,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time difference between the trigger (Ch D) rising edge and the 40MHz clock (Ch C) rising edge	
 	std::fstream newFile2(filename2.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile2 << "Run # | Event # | Delta T [s] Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
+	newFile2 << "Run # | Event # | Delta T [us] Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
 	for (unsigned i=0; i<deltaT_risingEdge.size(); i++) {
 		newFile2 << run_num << "   " << eventNum[i] << "   " <<  deltaT_risingEdge[i] << "\n" ;	
 	}	
@@ -254,7 +266,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time corresponding to the trigger rising edge at threshold
 	std::fstream newFile3(filename3.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile3 << "Rising Edge Time Point [s] for Ch D (Trigger Channel) \n"; 
+	newFile3 << "Rising Edge Time Point [us] for Ch D (Trigger Channel) \n"; 
 	for (unsigned i=0; i<timeD_risingEdge.size(); i++) {
 		newFile3 << eventNum[i] << "	" << timeD_risingEdge[i] << "\n" ;	
 
@@ -265,7 +277,7 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	///Create output file for the time corresponding to Ch C rising edge at threshold
 	std::fstream newFile4(filename4.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
-	newFile4 << "Rising Edge Time Point [s] for Ch C \n"; 
+	newFile4 << "Rising Edge Time Point [us] for Ch C \n"; 
 	for (unsigned i=0; i<timeC_risingEdge.size(); i++) {
 		newFile4 << eventNum[i] << "	" << timeC_risingEdge[i] << "\n" ;	
 
@@ -287,6 +299,20 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 		}
 	}
 		std::cout << outofrangeCounter << " events have a time difference <100ms or >300ms. Total Events: " << eventNumValue.size() << std::endl;
+
+
+	std::string filename6 = "run" + run_num + "_deltaTDate.txt";
+	std::cout << "Creating file " << filename6 << std::endl;
+
+	///Create output file for the time difference between the trigger (Ch D) rising edge and the 40MHz clock (Ch C) rising edge	
+	std::fstream newFile6(filename6.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
+	newFile6 << "Run # | Event # | Event Date | Delta T [us] Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
+	for (unsigned i=0; i<deltaT_risingEdge.size(); i++) {
+		newFile6 << run_num << "   " << eventNum[i] << "   " << eventDate[i] << "   " <<  deltaT_risingEdge[i] << "\n" ;	
+	}	
+
+	
+
 
 	return 0;
 } 

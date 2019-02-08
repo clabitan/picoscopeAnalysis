@@ -34,7 +34,7 @@ This uses frame\_\*.csv files.
 
 ### picoscopeAnalysis_TGraph.cxx
 
-This program does the same as picoscopeAnalysis.cxx, with the addition of creating a root file containing plots for each event and creating an output file containing the time difference between each event.
+This program does the same as picoscopeAnalysis.cxx, with the addition of creating a root file containing plots for each event and creating an output file containing the time difference between each event. For the output file containing the time difference between each event, times <100ms and >300ms are marked with '!!!'; this is because events are supposed to be 200ms apart. 
 
 This uses frame\_\*.csv files.
 
