@@ -107,10 +107,10 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	double meanChB_val = sumVal/sizeVec;
 	
 
+	//Create output file for the mean Ch. B values
 	std::string filename1 = "run" + run_num + "_mean_chB.txt";
 	std::cout << "Creating file " << filename1 << std::endl;
 
-	//Create output file for the mean Ch. B values
 	std::fstream newFile1(filename1.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name.
 	newFile1 << "Run # | Event # | Mean Voltage (V) for Ch. B \n";
 	for (unsigned i=0; i<meanChB.size(); i++) {
@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	}
 	newFile1 << run_num << "   " << "AllEvents" << "   " << meanChB_val;
 
+	///Create output file for the time difference between the trigger (Ch D) rising edge and the 40MHz clock (Ch C) rising edge	
 	std::string filename2 = "run" + run_num + "_deltaT.txt";
 	std::cout << "Creating file " << filename2 << std::endl;
 
-	///Create output file for the time difference between the trigger (Ch D) rising edge and the 40MHz clock (Ch C) rising edge	
 	std::fstream newFile2(filename2.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
 	newFile2 << "Run # | Event # | Delta T (s) Between Trigger (Ch D) rising edge and 40MHz Clock (Ch C) rising edge \n"; 
 	for (unsigned i=0; i<deltaT_risingEdge.size(); i++) {
@@ -129,10 +129,10 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 	}	
 
 
+	///Create output file for the time corresponding to the trigger rising edge at threshold
 	std::string filename3 = "run" + run_num + "_risingEdgeTime_chD.txt";
 	std::cout << "Creating file " << filename3 << std::endl;
 
-	///Create output file for the time corresponding to the trigger rising edge at threshold
 	std::fstream newFile3(filename3.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
 	newFile3 << "Rising Edge Time Point for Ch D (Trigger Channel) \n"; 
 	for (unsigned i=0; i<timeD_risingEdge.size(); i++) {
@@ -140,10 +140,10 @@ int main(int argc, char *argv[]) { //./picoscopeAnalysis path/to/directory run#
 
 	}	
 
+	///Create output file for the time corresponding to Ch C rising edge at threshold
 	std::string filename4 = "run" + run_num + "_risingEdgeTime_chC.txt";
 	std::cout << "Creating file " << filename4 << std::endl;
 
-	///Create output file for the time corresponding to Ch C rising edge at threshold
 	std::fstream newFile4(filename4.c_str(), std::ios::trunc | std::ios::out); //Make new file or rewrite file of same name. 
 	newFile4 << "Rising Edge Time Point for Ch C \n"; 
 	for (unsigned i=0; i<timeC_risingEdge.size(); i++) {
